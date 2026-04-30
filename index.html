@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lunar Adventures</title>
+  <meta name="theme-color" content="#1a1850">
+  <meta name="description" content="A growing collection of gentle moon-themed games for little explorers.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lunar Adventures">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <main id="menu">
+    <header>
+      <h1>Lunar Adventures</h1>
+      <p class="subtitle">Pick a game to play</p>
+    </header>
+
+    <ul class="games" role="list">
+      <li>
+        <a class="tile" href="games/lunar-garden/" data-tint="garden">
+          <div class="tile-glow"></div>
+          <div class="tile-icon">
+            <img src="games/lunar-garden/icon.svg" alt="" width="120" height="120">
+          </div>
+          <div class="tile-name">Lunar Garden</div>
+          <div class="tile-tag">Collect the moons</div>
+        </a>
+      </li>
+
+      <li>
+        <div class="tile locked" aria-disabled="true">
+          <div class="tile-icon">
+            <span class="placeholder">?</span>
+          </div>
+          <div class="tile-name">Coming Soon</div>
+          <div class="tile-tag">A new adventure</div>
+        </div>
+      </li>
+
+      <li>
+        <div class="tile locked" aria-disabled="true">
+          <div class="tile-icon">
+            <span class="placeholder">?</span>
+          </div>
+          <div class="tile-name">Coming Soon</div>
+          <div class="tile-tag">A new adventure</div>
+        </div>
+      </li>
+    </ul>
+
+    <footer>
+      <span class="made-for">Made with love for Luna</span>
+    </footer>
+  </main>
+
+  <button id="install" hidden>Install</button>
+  <script src="menu.js"></script>
+</body>
+</html>

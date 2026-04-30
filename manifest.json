@@ -1,0 +1,26 @@
+{
+  "name": "Lunar Adventures",
+  "short_name": "Lunar",
+  "description": "A growing collection of gentle moon-themed games for little explorers.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#080826",
+  "theme_color": "#1a1850",
+  "categories": ["games", "kids", "entertainment"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
