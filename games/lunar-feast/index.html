@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lunar Feast — Lunar Adventures</title>
+  <meta name="theme-color" content="#1a1850">
+  <link rel="manifest" href="../../manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lunar Feast">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <a id="back" href="../../" aria-label="Back to menu">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M15 6 L9 12 L15 18"/>
+    </svg>
+    <span>Menu</span>
+  </a>
+  <div id="hud" hidden>
+    <div class="hud-label">Stars fed</div>
+    <div class="hud-value" id="counter">0</div>
+  </div>
+  <div id="title">
+    <h1>Lunar Feast</h1>
+    <p>Fly with the <span class="key">arrow keys</span> or your <span class="key">finger</span></p>
+    <p>Collect stars and feed each moon its favorite color!</p>
+    <p class="hint">Touch the screen or press an arrow key to start</p>
+  </div>
+  <script src="../shared/lunarlib.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

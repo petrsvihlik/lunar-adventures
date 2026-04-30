@@ -1,4 +1,4 @@
-const CACHE = 'lunar-adventures-v1';
+const CACHE = 'lunar-adventures-v2';
 const FILES = [
   './',
   './index.html',
@@ -7,12 +7,23 @@ const FILES = [
   './manifest.json',
   './icon.svg',
   './icon-maskable.svg',
+  './games/shared/lunarlib.js',
   './games/lunar-garden/',
   './games/lunar-garden/index.html',
   './games/lunar-garden/style.css',
   './games/lunar-garden/game.js',
   './games/lunar-garden/icon.svg',
-  './games/lunar-garden/icon-maskable.svg'
+  './games/lunar-garden/icon-maskable.svg',
+  './games/lunar-hop/',
+  './games/lunar-hop/index.html',
+  './games/lunar-hop/style.css',
+  './games/lunar-hop/game.js',
+  './games/lunar-hop/icon.svg',
+  './games/lunar-feast/',
+  './games/lunar-feast/index.html',
+  './games/lunar-feast/style.css',
+  './games/lunar-feast/game.js',
+  './games/lunar-feast/icon.svg'
 ];
 
 self.addEventListener('install', e => {
