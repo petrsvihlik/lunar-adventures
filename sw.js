@@ -1,4 +1,4 @@
-const CACHE = 'lunar-adventures-v2';
+const CACHE = 'lunar-adventures-v3';
 const FILES = [
   './',
   './index.html',
