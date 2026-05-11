@@ -16,11 +16,16 @@ const CONSTELLATIONS = [
   {
     name: 'Fish',
     points: [
-      [0.10, 0.50], // mouth
-      [0.50, 0.22], // top
-      [0.88, 0.18], // tail top
-      [0.88, 0.82], // tail bottom
-      [0.50, 0.78], // bottom
+      [0.05, 0.50], // mouth tip
+      [0.25, 0.36], // upper head
+      [0.42, 0.10], // dorsal fin tip
+      [0.62, 0.32], // upper back
+      [0.95, 0.16], // tail upper tip
+      [0.80, 0.50], // tail notch
+      [0.95, 0.84], // tail lower tip
+      [0.62, 0.68], // lower back
+      [0.42, 0.92], // anal fin tip
+      [0.25, 0.64], // lower head
     ],
     tint: '#a8d8ff',
   },
