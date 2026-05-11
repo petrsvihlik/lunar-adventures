@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#3a2a8a"/>
+      <stop offset="60%" stop-color="#1a1850"/>
+      <stop offset="100%" stop-color="#0a0a3a"/>
+    </radialGradient>
+    <radialGradient id="starHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff8c8" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#fff8c8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bunnyGlow" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#fff5d6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fff5d6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)" rx="96"/>
+
+  <!-- background stars -->
+  <g fill="white" opacity="0.85">
+    <circle cx="60"  cy="100" r="2.6"/>
+    <circle cx="430" cy="80"  r="3"/>
+    <circle cx="50"  cy="430" r="2.6"/>
+    <circle cx="460" cy="450" r="3"/>
+    <circle cx="200" cy="60"  r="2"/>
+    <circle cx="80"  cy="260" r="1.8"/>
+    <circle cx="440" cy="280" r="2"/>
+  </g>
+
+  <!-- constellation: a bunny silhouette glow -->
+  <path d="M 170 130 L 195 280 L 130 360 L 256 440 L 382 360 L 317 280 L 342 130 L 256 290 Z"
+        fill="url(#bunnyGlow)"/>
+
+  <!-- connecting lines -->
+  <g stroke="#ffe6a8" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.85"
+     style="filter: drop-shadow(0 0 8px rgba(255, 230, 168, 0.7))">
+    <path d="M 170 130 L 195 280 L 130 360 L 256 440 L 382 360 L 317 280 L 342 130 L 256 290 L 170 130"/>
+  </g>
+
+  <!-- star halos -->
+  <g>
+    <circle cx="170" cy="130" r="40" fill="url(#starHalo)"/>
+    <circle cx="195" cy="280" r="38" fill="url(#starHalo)"/>
+    <circle cx="130" cy="360" r="36" fill="url(#starHalo)"/>
+    <circle cx="256" cy="440" r="42" fill="url(#starHalo)"/>
+    <circle cx="382" cy="360" r="36" fill="url(#starHalo)"/>
+    <circle cx="317" cy="280" r="38" fill="url(#starHalo)"/>
+    <circle cx="342" cy="130" r="40" fill="url(#starHalo)"/>
+    <circle cx="256" cy="290" r="36" fill="url(#starHalo)"/>
+  </g>
+
+  <!-- star sparkles (5-point) -->
+  <g fill="#fff8c8">
+    <path d="M 170 108 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+    <path d="M 195 258 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+    <path d="M 130 338 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+    <path d="M 256 418 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+    <path d="M 382 338 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+    <path d="M 317 258 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+    <path d="M 342 108 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+    <path d="M 256 268 l 6 16 l 16 6 l -16 6 l -6 16 l -6 -16 l -16 -6 l 16 -6 z"/>
+  </g>
+</svg>
