@@ -170,6 +170,40 @@ const CONSTELLATIONS = [
     ],
     tint: '#ffd6f5',
   },
+  {
+    name: 'Teddy',
+    points: [
+      [0.22, 0.10], // left ear top
+      [0.32, 0.20], // left ear inside valley
+      [0.50, 0.16], // between ears (forehead)
+      [0.68, 0.20], // right ear inside valley
+      [0.78, 0.10], // right ear top
+      [0.88, 0.36], // right side of head into shoulder
+      [0.95, 0.55], // right paw
+      [0.82, 0.92], // right foot
+      [0.50, 0.86], // between legs
+      [0.18, 0.92], // left foot
+      [0.05, 0.55], // left paw
+      [0.12, 0.36], // left side of head into shoulder
+    ],
+    tint: '#d8a878',
+  },
+  {
+    name: 'Human',
+    points: [
+      [0.50, 0.08], // top of head
+      [0.62, 0.16], // right side of head/neck
+      [0.95, 0.40], // right hand
+      [0.62, 0.55], // right armpit/waist
+      [0.75, 0.95], // right foot
+      [0.50, 0.82], // between feet
+      [0.25, 0.95], // left foot
+      [0.38, 0.55], // left armpit/waist
+      [0.05, 0.40], // left hand
+      [0.38, 0.16], // left side of head/neck
+    ],
+    tint: '#ffd8a8',
+  },
 ];
 
 let level = -1;
