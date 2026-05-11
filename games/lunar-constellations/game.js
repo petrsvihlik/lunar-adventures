@@ -138,6 +138,38 @@ const CONSTELLATIONS = [
     ],
     tint: '#ff9b6f',
   },
+  {
+    name: 'Rainbow',
+    points: [
+      [0.05, 0.85], // bottom-left outer
+      [0.20, 0.30], // upper-left outer
+      [0.50, 0.10], // top outer
+      [0.80, 0.30], // upper-right outer
+      [0.95, 0.85], // bottom-right outer
+      [0.80, 0.85], // bottom-right inner
+      [0.68, 0.38], // upper-right inner
+      [0.50, 0.30], // top inner
+      [0.32, 0.38], // upper-left inner
+      [0.20, 0.85], // bottom-left inner
+    ],
+    tint: '#ff8fcf',
+  },
+  {
+    name: 'Unicorn',
+    points: [
+      [0.40, 0.06], // horn tip
+      [0.44, 0.22], // horn base back
+      [0.55, 0.18], // ear tip
+      [0.86, 0.65], // mane back
+      [0.78, 0.92], // lower neck back
+      [0.48, 0.92], // lower neck front
+      [0.32, 0.72], // throat
+      [0.18, 0.62], // jaw
+      [0.05, 0.50], // nose
+      [0.28, 0.34], // nose bridge
+    ],
+    tint: '#ffd6f5',
+  },
 ];
 
 let level = -1;
