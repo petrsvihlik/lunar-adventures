@@ -153,6 +153,7 @@ const CONSTELLATIONS = [
       [0.20, 0.85], // bottom-left inner
     ],
     tint: '#ff8fcf',
+    special: 'rainbow',
   },
   {
     name: 'Unicorn',
@@ -336,10 +337,16 @@ canvas.addEventListener('pointerdown', e => {
       solvedFrame = frame;
       setTimeout(() => {
         Lunar.audio.playCelebration();
-        const tint = CONSTELLATIONS[level].tint;
+        const c = CONSTELLATIONS[level];
         const cx = stars.reduce((s, p) => s + p.x, 0) / stars.length;
         const cy = stars.reduce((s, p) => s + p.y, 0) / stars.length;
-        Lunar.draw.makeParticleBurst(particles, cx, cy, ['#fff8c8', '#ffe6a8', tint], 44);
+        if (c.special === 'rainbow') {
+          for (const col of RAINBOW_COLORS) {
+            Lunar.draw.makeParticleBurst(particles, cx, cy, ['#fff8c8', col, col], 8);
+          }
+        } else {
+          Lunar.draw.makeParticleBurst(particles, cx, cy, ['#fff8c8', '#ffe6a8', c.tint], 44);
+        }
       }, 250);
     }
   } else {
@@ -403,6 +410,54 @@ function drawTwinkleStar(x, y, r, opts) {
   }
 }
 
+const RAINBOW_COLORS = [
+  '#ff5050', // red
+  '#ff9b30', // orange
+  '#ffe040', // yellow
+  '#5ad55a', // green
+  '#5090ff', // blue
+  '#7050d0', // indigo
+  '#c060e0', // violet
+];
+
+// Special fill for the Rainbow constellation:
+// 10 stars = outer arc (idx 0..4) and inner arc (idx 5..9, reversed to pair with outer).
+// We draw 7 concentric arch bands between them and stagger their reveal.
+function drawRainbowFill(stars, revealT, frame) {
+  const N = RAINBOW_COLORS.length;
+  const outer = stars.slice(0, 5);
+  const inner = [stars[9], stars[8], stars[7], stars[6], stars[5]];
+
+  const pairLerp = (t) => outer.map((o, i) => ({
+    x: o.x * (1 - t) + inner[i].x * t,
+    y: o.y * (1 - t) + inner[i].y * t,
+  }));
+
+  for (let k = 0; k < N; k++) {
+    // Stagger: outer band first, inner band last
+    const tStart = k / (N + 1);
+    const bandT = Math.max(0, Math.min(1, (revealT - tStart) * (N + 1)));
+    if (bandT <= 0) continue;
+
+    const top = pairLerp(k / N);
+    const bot = pairLerp((k + 1) / N);
+
+    ctx.beginPath();
+    top.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+    for (let i = bot.length - 1; i >= 0; i--) ctx.lineTo(bot[i].x, bot[i].y);
+    ctx.closePath();
+
+    // Gentle shimmer once the band has fully appeared
+    const baseA = 0.55 * bandT;
+    const shimmer = bandT >= 1 ? Math.sin(frame * 0.05 + k * 0.7) * 0.12 : 0;
+    ctx.shadowColor = RAINBOW_COLORS[k];
+    ctx.shadowBlur = 28 * bandT;
+    ctx.fillStyle = Lunar.draw.hexA(RAINBOW_COLORS[k], baseA + shimmer);
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+}
+
 function render() {
   Lunar.sky.drawSky(ctx, sky, W, H);
 
@@ -410,22 +465,26 @@ function render() {
   if (solved && revealT > 0) {
     const c = CONSTELLATIONS[level];
     ctx.save();
-    ctx.beginPath();
-    for (let i = 0; i < stars.length; i++) {
-      const p = stars[i];
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
+    if (c.special === 'rainbow') {
+      drawRainbowFill(stars, revealT, frame);
+    } else {
+      ctx.beginPath();
+      for (let i = 0; i < stars.length; i++) {
+        const p = stars[i];
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.closePath();
+      // Soft outer glow
+      ctx.shadowColor = c.tint;
+      ctx.shadowBlur = 60 * revealT;
+      ctx.fillStyle = Lunar.draw.hexA(c.tint, 0.35 * revealT);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // Inner brighter fill
+      ctx.fillStyle = Lunar.draw.hexA(c.tint, 0.18 * revealT);
+      ctx.fill();
     }
-    ctx.closePath();
-    // Soft outer glow
-    ctx.shadowColor = c.tint;
-    ctx.shadowBlur = 60 * revealT;
-    ctx.fillStyle = Lunar.draw.hexA(c.tint, 0.35 * revealT);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    // Inner brighter fill
-    ctx.fillStyle = Lunar.draw.hexA(c.tint, 0.18 * revealT);
-    ctx.fill();
     ctx.restore();
   }
 
