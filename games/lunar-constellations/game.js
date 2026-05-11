@@ -240,6 +240,8 @@ function newGame() {
   counterEl.textContent = '0';
 }
 
+let fitX = 0, fitY = 0, fitSize = 0;
+
 function layout() {
   if (!stars.length) return;
   const portrait = H > W;
@@ -251,6 +253,9 @@ function layout() {
   const size = Math.min(availW, availH);
   const offsetX = (W - size) / 2;
   const offsetY = topMargin + (availH - size) / 2;
+  fitX = offsetX;
+  fitY = offsetY;
+  fitSize = size;
 
   const baseR = Math.max(14, size * 0.038);
   const pts = CONSTELLATIONS[level].points;
@@ -458,6 +463,411 @@ function drawRainbowFill(stars, revealT, frame) {
   ctx.shadowBlur = 0;
 }
 
+// Normalized-coord helpers (use after layout()).
+const nx = (x) => fitX + x * fitSize;
+const ny = (y) => fitY + y * fitSize;
+const ns = (v) => v * fitSize;
+
+function drawSmallEye(x, y, r) {
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#1a1850';
+  ctx.beginPath(); ctx.arc(x + r * 0.2, y, r * 0.55, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(x + r * 0.4, y - r * 0.25, r * 0.2, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawSmileArc(x, y, w, lineW, color = '#3a2a5a') {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineW;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(x, y, w, 0.15 * Math.PI, 0.85 * Math.PI);
+  ctx.stroke();
+}
+
+function drawCloud(x, y, r, alpha = 0.85) {
+  ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+  ctx.beginPath();
+  ctx.arc(x - r * 0.65, y, r * 0.6, 0, Math.PI * 2);
+  ctx.arc(x, y - r * 0.30, r * 0.7, 0, Math.PI * 2);
+  ctx.arc(x + r * 0.65, y, r * 0.55, 0, Math.PI * 2);
+  ctx.arc(x, y + r * 0.20, r * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Shape-specific decorations drawn over the silhouette once it's revealed.
+function drawAccents(c, alpha) {
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  switch (c.name) {
+    case 'Fish': {
+      // Eye
+      drawSmallEye(nx(0.20), ny(0.44), ns(0.045));
+      // Gill curve
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = ns(0.012);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.32), ny(0.40));
+      ctx.quadraticCurveTo(nx(0.36), ny(0.50), nx(0.32), ny(0.60));
+      ctx.stroke();
+      // Drifting bubble
+      const bobT = (frame * 0.008) % 1;
+      const bx = nx(-0.02 + Math.sin(frame * 0.04) * 0.02);
+      const by = ny(0.46 - bobT * 0.35);
+      ctx.globalAlpha = alpha * (1 - bobT);
+      ctx.fillStyle = 'rgba(200, 230, 255, 0.85)';
+      ctx.beginPath(); ctx.arc(bx, by, ns(0.022), 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.lineWidth = ns(0.005);
+      ctx.beginPath(); ctx.arc(bx, by, ns(0.022), 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = alpha;
+      break;
+    }
+    case 'Heart': {
+      drawSmallEye(nx(0.40), ny(0.50), ns(0.05));
+      drawSmallEye(nx(0.60), ny(0.50), ns(0.05));
+      drawSmileArc(nx(0.50), ny(0.60), ns(0.10), ns(0.018));
+      // Inner shine
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(nx(0.26), ny(0.34), ns(0.06), ns(0.04), -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+    case 'Bunny': {
+      // Pink ear interiors
+      ctx.fillStyle = 'rgba(255, 143, 207, 0.7)';
+      ctx.beginPath(); ctx.ellipse(nx(0.32), ny(0.26), ns(0.04), ns(0.10), 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(nx(0.68), ny(0.26), ns(0.04), ns(0.10), 0, 0, Math.PI * 2); ctx.fill();
+      // Eyes
+      drawSmallEye(nx(0.40), ny(0.60), ns(0.05));
+      drawSmallEye(nx(0.60), ny(0.60), ns(0.05));
+      // Nose
+      ctx.fillStyle = '#ff8fcf';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.50), ny(0.68));
+      ctx.lineTo(nx(0.46), ny(0.72));
+      ctx.lineTo(nx(0.54), ny(0.72));
+      ctx.closePath();
+      ctx.fill();
+      // Smile
+      drawSmileArc(nx(0.50), ny(0.74), ns(0.06), ns(0.012));
+      // Whiskers
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = ns(0.008);
+      ctx.beginPath();
+      ctx.moveTo(nx(0.42), ny(0.72)); ctx.lineTo(nx(0.30), ny(0.70));
+      ctx.moveTo(nx(0.42), ny(0.74)); ctx.lineTo(nx(0.30), ny(0.76));
+      ctx.moveTo(nx(0.58), ny(0.72)); ctx.lineTo(nx(0.70), ny(0.70));
+      ctx.moveTo(nx(0.58), ny(0.74)); ctx.lineTo(nx(0.70), ny(0.76));
+      ctx.stroke();
+      break;
+    }
+    case 'Kitty': {
+      // Pink ear interiors
+      ctx.fillStyle = 'rgba(255, 143, 207, 0.7)';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.34), ny(0.22)); ctx.lineTo(nx(0.42), ny(0.32)); ctx.lineTo(nx(0.36), ny(0.34));
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(nx(0.66), ny(0.22)); ctx.lineTo(nx(0.58), ny(0.32)); ctx.lineTo(nx(0.64), ny(0.34));
+      ctx.closePath(); ctx.fill();
+      // Eyes (green pupils!)
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(nx(0.40), ny(0.50), ns(0.05), 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(nx(0.60), ny(0.50), ns(0.05), 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#5ad55a';
+      ctx.beginPath(); ctx.ellipse(nx(0.41), ny(0.50), ns(0.012), ns(0.035), 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(nx(0.61), ny(0.50), ns(0.012), ns(0.035), 0, 0, Math.PI * 2); ctx.fill();
+      // Nose
+      ctx.fillStyle = '#ff8fcf';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.50), ny(0.58));
+      ctx.lineTo(nx(0.46), ny(0.62));
+      ctx.lineTo(nx(0.54), ny(0.62));
+      ctx.closePath();
+      ctx.fill();
+      // Smile (two arcs under the nose)
+      ctx.strokeStyle = '#3a2a5a';
+      ctx.lineWidth = ns(0.012);
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(nx(0.46), ny(0.66), ns(0.04), 0, Math.PI); ctx.stroke();
+      ctx.beginPath(); ctx.arc(nx(0.54), ny(0.66), ns(0.04), 0, Math.PI); ctx.stroke();
+      // Whiskers
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = ns(0.008);
+      ctx.beginPath();
+      ctx.moveTo(nx(0.42), ny(0.60)); ctx.lineTo(nx(0.28), ny(0.58));
+      ctx.moveTo(nx(0.42), ny(0.62)); ctx.lineTo(nx(0.28), ny(0.64));
+      ctx.moveTo(nx(0.58), ny(0.60)); ctx.lineTo(nx(0.72), ny(0.58));
+      ctx.moveTo(nx(0.58), ny(0.62)); ctx.lineTo(nx(0.72), ny(0.64));
+      ctx.stroke();
+      break;
+    }
+    case 'Star': {
+      const cx = nx(0.5), cy = ny(0.5);
+      const pulse = 0.85 + Math.sin(frame * 0.1) * 0.25;
+      ctx.fillStyle = 'rgba(255, 245, 200, 0.85)';
+      Lunar.draw.drawStar(ctx, cx, cy, ns(0.05) * pulse, ns(0.11) * pulse);
+      ctx.fillStyle = '#fff';
+      Lunar.draw.drawStar(ctx, cx, cy, ns(0.018), ns(0.05));
+      // Twinkles around
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      const sparkles = [[0.30, 0.30], [0.70, 0.30], [0.30, 0.65], [0.70, 0.65]];
+      for (let i = 0; i < sparkles.length; i++) {
+        const tw = 0.5 + Math.sin(frame * 0.12 + i * 1.7) * 0.5;
+        if (tw > 0.3) {
+          ctx.globalAlpha = alpha * tw;
+          ctx.beginPath();
+          ctx.arc(nx(sparkles[i][0]), ny(sparkles[i][1]), ns(0.012) * tw, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = alpha;
+      break;
+    }
+    case 'Flower': {
+      const cx = nx(0.50), cy = ny(0.50);
+      ctx.fillStyle = '#ffe6a8';
+      ctx.beginPath(); ctx.arc(cx, cy, ns(0.11), 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffa86f';
+      ctx.beginPath(); ctx.arc(cx, cy, ns(0.075), 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#7a4818';
+      for (let a = 0; a < 7; a++) {
+        const ang = (a / 7) * Math.PI * 2;
+        const rr = a === 0 ? 0 : ns(0.04);
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr, ns(0.013), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      break;
+    }
+    case 'Butterfly': {
+      // Body
+      ctx.strokeStyle = '#3a2a5a';
+      ctx.lineWidth = ns(0.025);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.50), ny(0.38));
+      ctx.lineTo(nx(0.50), ny(0.62));
+      ctx.stroke();
+      // Antennae
+      ctx.lineWidth = ns(0.008);
+      ctx.beginPath();
+      ctx.moveTo(nx(0.50), ny(0.38));
+      ctx.quadraticCurveTo(nx(0.42), ny(0.28), nx(0.38), ny(0.22));
+      ctx.moveTo(nx(0.50), ny(0.38));
+      ctx.quadraticCurveTo(nx(0.58), ny(0.28), nx(0.62), ny(0.22));
+      ctx.stroke();
+      ctx.fillStyle = '#3a2a5a';
+      ctx.beginPath(); ctx.arc(nx(0.38), ny(0.22), ns(0.015), 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(nx(0.62), ny(0.22), ns(0.015), 0, Math.PI * 2); ctx.fill();
+      // Wing dots
+      ctx.fillStyle = 'rgba(255, 230, 168, 0.85)';
+      ctx.beginPath();
+      ctx.arc(nx(0.22), ny(0.40), ns(0.030), 0, Math.PI * 2);
+      ctx.arc(nx(0.30), ny(0.62), ns(0.025), 0, Math.PI * 2);
+      ctx.arc(nx(0.78), ny(0.40), ns(0.030), 0, Math.PI * 2);
+      ctx.arc(nx(0.70), ny(0.62), ns(0.025), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ff8fcf';
+      ctx.beginPath();
+      ctx.arc(nx(0.22), ny(0.40), ns(0.012), 0, Math.PI * 2);
+      ctx.arc(nx(0.78), ny(0.40), ns(0.012), 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+    case 'Sailboat': {
+      // Mast (from peak down to deck)
+      ctx.strokeStyle = 'rgba(60, 40, 20, 0.85)';
+      ctx.lineWidth = ns(0.014);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.50), ny(0.08));
+      ctx.lineTo(nx(0.50), ny(0.58));
+      ctx.stroke();
+      // Flag
+      ctx.fillStyle = '#ff8fcf';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.50), ny(0.08));
+      ctx.lineTo(nx(0.66), ny(0.12));
+      ctx.lineTo(nx(0.50), ny(0.16));
+      ctx.closePath();
+      ctx.fill();
+      // Porthole on hull
+      ctx.fillStyle = '#ffe6a8';
+      ctx.beginPath();
+      ctx.arc(nx(0.50), ny(0.74), ns(0.04), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(60, 40, 20, 0.85)';
+      ctx.lineWidth = ns(0.008);
+      ctx.beginPath();
+      ctx.arc(nx(0.50), ny(0.74), ns(0.04), 0, Math.PI * 2);
+      ctx.stroke();
+      // Wavy water below (drifts)
+      ctx.strokeStyle = 'rgba(168, 216, 255, 0.8)';
+      ctx.lineWidth = ns(0.012);
+      const drift = frame * 0.03;
+      ctx.beginPath();
+      let started = false;
+      for (let x = 0.0; x <= 1.0; x += 0.04) {
+        const yWave = 0.96 + Math.sin(x * 18 + drift) * 0.012;
+        const px = nx(x), py = ny(yWave);
+        if (!started) { ctx.moveTo(px, py); started = true; }
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+      break;
+    }
+    case 'House': {
+      // Door
+      ctx.fillStyle = 'rgba(140, 70, 35, 0.95)';
+      const doorX = nx(0.42), doorY = ny(0.58), doorW = ns(0.16), doorH = ns(0.32);
+      ctx.fillRect(doorX, doorY, doorW, doorH);
+      ctx.strokeStyle = 'rgba(60, 30, 15, 0.8)';
+      ctx.lineWidth = ns(0.008);
+      ctx.strokeRect(doorX, doorY, doorW, doorH);
+      // Doorknob
+      ctx.fillStyle = '#ffe6a8';
+      ctx.beginPath();
+      ctx.arc(doorX + doorW * 0.78, doorY + doorH * 0.55, ns(0.014), 0, Math.PI * 2);
+      ctx.fill();
+      // Window with cross
+      ctx.fillStyle = 'rgba(168, 216, 255, 0.9)';
+      const winX = nx(0.62), winY = ny(0.55), winS = ns(0.16);
+      ctx.fillRect(winX, winY, winS, winS);
+      ctx.strokeStyle = 'rgba(60, 40, 20, 0.85)';
+      ctx.lineWidth = ns(0.012);
+      ctx.strokeRect(winX, winY, winS, winS);
+      ctx.beginPath();
+      ctx.moveTo(winX + winS / 2, winY);
+      ctx.lineTo(winX + winS / 2, winY + winS);
+      ctx.moveTo(winX, winY + winS / 2);
+      ctx.lineTo(winX + winS, winY + winS / 2);
+      ctx.stroke();
+      // Chimney
+      ctx.fillStyle = 'rgba(140, 70, 35, 0.95)';
+      ctx.fillRect(nx(0.66), ny(0.18), ns(0.08), ns(0.14));
+      ctx.strokeStyle = 'rgba(60, 30, 15, 0.8)';
+      ctx.lineWidth = ns(0.008);
+      ctx.strokeRect(nx(0.66), ny(0.18), ns(0.08), ns(0.14));
+      // Animated smoke puffs
+      for (let i = 0; i < 3; i++) {
+        const t = ((frame * 0.6) + i * 30) % 90 / 90;
+        const sx = nx(0.70) + Math.sin(t * Math.PI * 2 + i) * ns(0.035);
+        const sy = ny(0.18) - t * ns(0.20);
+        const sr = ns(0.022 + t * 0.025);
+        ctx.globalAlpha = alpha * (1 - t) * 0.7;
+        ctx.fillStyle = 'rgba(240, 240, 250, 1)';
+        ctx.beginPath();
+        ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = alpha;
+      break;
+    }
+    case 'Rainbow': {
+      // Clouds at each base
+      drawCloud(nx(0.12), ny(0.86), ns(0.10));
+      drawCloud(nx(0.88), ny(0.86), ns(0.10));
+      break;
+    }
+    case 'Unicorn': {
+      // Eye
+      drawSmallEye(nx(0.30), ny(0.50), ns(0.038));
+      // Nostril
+      ctx.fillStyle = '#3a2a5a';
+      ctx.beginPath();
+      ctx.ellipse(nx(0.13), ny(0.51), ns(0.014), ns(0.010), 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Mouth
+      ctx.strokeStyle = '#3a2a5a';
+      ctx.lineWidth = ns(0.012);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(nx(0.14), ny(0.58), ns(0.04), 0.2 * Math.PI, 0.8 * Math.PI);
+      ctx.stroke();
+      // Glittering horn stripes
+      ctx.strokeStyle = 'rgba(255, 230, 168, 0.85)';
+      ctx.lineWidth = ns(0.005);
+      ctx.beginPath();
+      ctx.moveTo(nx(0.34), ny(0.20)); ctx.lineTo(nx(0.42), ny(0.18));
+      ctx.moveTo(nx(0.36), ny(0.15)); ctx.lineTo(nx(0.42), ny(0.13));
+      ctx.stroke();
+      // Rainbow mane strands
+      const maneColors = ['#ff8fcf', '#ffd699', '#a8ffc8', '#a8d8ff', '#c5a8ff'];
+      ctx.lineWidth = ns(0.024);
+      ctx.lineCap = 'round';
+      for (let i = 0; i < maneColors.length; i++) {
+        ctx.strokeStyle = maneColors[i];
+        const offset = i * 0.045;
+        ctx.beginPath();
+        ctx.moveTo(nx(0.55 + offset * 0.4), ny(0.28 + offset * 0.6));
+        ctx.quadraticCurveTo(nx(0.78 + offset * 0.2), ny(0.50 + offset * 0.4),
+                              nx(0.70 + offset * 0.2), ny(0.78 + offset * 0.3));
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'Teddy': {
+      // Pink ear interiors
+      ctx.fillStyle = 'rgba(255, 143, 207, 0.7)';
+      ctx.beginPath(); ctx.ellipse(nx(0.28), ny(0.16), ns(0.05), ns(0.06), 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(nx(0.72), ny(0.16), ns(0.05), ns(0.06), 0, 0, Math.PI * 2); ctx.fill();
+      // Tummy patch (lighter)
+      ctx.fillStyle = 'rgba(255, 230, 168, 0.5)';
+      ctx.beginPath(); ctx.ellipse(nx(0.50), ny(0.66), ns(0.18), ns(0.16), 0, 0, Math.PI * 2); ctx.fill();
+      // Eyes
+      drawSmallEye(nx(0.38), ny(0.36), ns(0.04));
+      drawSmallEye(nx(0.62), ny(0.36), ns(0.04));
+      // Nose
+      ctx.fillStyle = '#3a2a5a';
+      ctx.beginPath();
+      ctx.ellipse(nx(0.50), ny(0.46), ns(0.04), ns(0.028), 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Mouth
+      ctx.strokeStyle = '#3a2a5a';
+      ctx.lineWidth = ns(0.012);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(nx(0.50), ny(0.49)); ctx.lineTo(nx(0.50), ny(0.53));
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(nx(0.46), ny(0.55), ns(0.04), 0, Math.PI); ctx.stroke();
+      ctx.beginPath(); ctx.arc(nx(0.54), ny(0.55), ns(0.04), 0, Math.PI); ctx.stroke();
+      // Paw pads
+      ctx.fillStyle = 'rgba(255, 200, 150, 0.7)';
+      ctx.beginPath(); ctx.arc(nx(0.08), ny(0.56), ns(0.03), 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(nx(0.92), ny(0.56), ns(0.03), 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(nx(0.20), ny(0.90), ns(0.04), ns(0.025), 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(nx(0.80), ny(0.90), ns(0.04), ns(0.025), 0, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'Human': {
+      // T-shirt
+      ctx.fillStyle = 'rgba(255, 143, 207, 0.55)';
+      ctx.beginPath();
+      ctx.ellipse(nx(0.50), ny(0.50), ns(0.13), ns(0.18), 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Eyes
+      drawSmallEye(nx(0.45), ny(0.12), ns(0.024));
+      drawSmallEye(nx(0.55), ny(0.12), ns(0.024));
+      // Smile
+      drawSmileArc(nx(0.50), ny(0.16), ns(0.045), ns(0.010));
+      // Cheek blush
+      ctx.fillStyle = 'rgba(255, 143, 207, 0.55)';
+      ctx.beginPath(); ctx.arc(nx(0.42), ny(0.16), ns(0.015), 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(nx(0.58), ny(0.16), ns(0.015), 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+  }
+
+  ctx.restore();
+}
+
 function render() {
   Lunar.sky.drawSky(ctx, sky, W, H);
 
@@ -486,6 +896,9 @@ function render() {
       ctx.fill();
     }
     ctx.restore();
+    // Shape-specific accents, fade in once silhouette is half revealed
+    const accentAlpha = Math.max(0, Math.min(1, (revealT - 0.4) * 1.8));
+    drawAccents(c, accentAlpha);
   }
 
   // Connected lines
