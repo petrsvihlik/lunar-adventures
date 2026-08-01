@@ -1,0 +1,14 @@
+# Dependabot configuration
+# This repo is a dependency-free static PWA (no npm/package manifests, no CDN
+# scripts), so the only updatable ecosystem is GitHub Actions used in
+# .github/workflows/.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
